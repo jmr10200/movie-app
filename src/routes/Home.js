@@ -7,17 +7,23 @@ class Home extends React.Component {
 
   state = {
     isLoading: true,
-    movies: [],
+    results: [],
   };
-
+  
   getMovies = async () => {
     const {
-      data: {
-        data: { movies },
-      },
-    } = await axios.get('https://yts-proxy.now.sh/list_movies.json?sort_by=rating');
-    this.setState({movies, isLoading: false})
-  }
+      data: { results }
+    } = await axios.get(
+      'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc',
+      {headers: {
+        accept: 'application/json',
+        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3ODFkMjU5ODkzMDQ3Y2E5ZjZiMjdiYjc3MThmMzQ0ZSIsInN1YiI6IjY0Y2YxNTIzMzAzYzg1MDExZGQzZGY3MCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.9F4oNXgCAMxXsNsOmXB0bN0TZSxPDM6ensHWsrzifRY'
+      }
+    });
+      
+    this.setState({results, isLoading: false});
+
+  };
 
   componentDidMount() {
     // 영화 데이터 로딩
@@ -25,7 +31,7 @@ class Home extends React.Component {
   }
 
   render() {
-    const { isLoading, movies } = this.state;
+    const { isLoading, results } = this.state;
     return (
     <section className="container">
       {isLoading ? (
@@ -34,15 +40,15 @@ class Home extends React.Component {
         </div>
       ) : (
           <div className="movies">
-            {movies.map((movie) => (
+            {results.map((movie) => (
               <Movie 
                 key={movie.id}
                 id={movie.id}
-                year={movie.year}
-                title={movie.title}
-                summary={movie.summary}
-                poster={movie.medium_cover_image}
-                genres={movie.genres}
+                year={movie.release_date}
+                title={movie.original_title}
+                summary={movie.overview}
+                poster={"https://image.tmdb.org/t/p/w500" && movie.poster_path}
+                //genres={movie.genres}
               />)
             )}
           </div>
